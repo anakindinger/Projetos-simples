@@ -1,0 +1,46 @@
+//CONSTANTES
+
+const classe = SpreadsheetApp                                   //Classe que permite acessar as planilhas
+
+const ativaPlanilha = classe.getActiveSpreadsheet()             //Ativa o documento como um todo, incluindo todas as abas
+
+
+const drive = DriveApp
+const email = GmailApp
+
+const idPastasPdfs = ''
+const sheetName = ''
+
+
+
+function selecionaArquivos()
+{
+
+  
+  let dadosVindosDaPlanilha = ativaPlanilha.getSheetByName(sheetName).getRange('').getValues().filter(i=>(i[0] !=='' && i[1]!==''))
+
+  let pastaAProcurar = drive.getFolderById(idPastasPdfs)
+
+  let arquivos = pastaAProcurar.getFiles()
+
+  let arquivo = []
+
+  while(arquivos.hasNext())
+  {
+
+    arquivo.push((arquivos.next().getName()).split('.pdf')[0])
+
+  }
+
+  dadosVindosDaPlanilha.map((elemento)=>{ 
+   
+
+    let arquivoPdf = drive.getFolderById(idPastasPdfs).getFilesByName(`${elemento[1]}.pdf`).next().getAs('application/pdf')
+    
+    //Logger.log(arquivoPdf.getName())
+
+    email.sendEmail(elemento[0],`O assunto do e-mail`,`O corpo do e-mail!`,{attachments:[arquivoPdf]})
+
+  })
+
+}
